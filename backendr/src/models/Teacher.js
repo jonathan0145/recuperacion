@@ -2,10 +2,11 @@ import { DataTypes } from 'sequelize';
 import sequelize from '../../config/database.js';
 import Person from './Person.js';
 
-const Teacher = sequelize.define('Teacher', {
+const Teacher = sequelize.define('teacher', {
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
+    autoIncrement: true,
     allowNull: false,
     references: {
       model: Person,
@@ -22,6 +23,7 @@ const Teacher = sequelize.define('Teacher', {
   },
 }, {
   timestamps: false,
+  tableName: 'teacher',
 });
 
 export default Teacher;

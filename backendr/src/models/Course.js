@@ -2,10 +2,11 @@ import { DataTypes } from 'sequelize';
 import sequelize from '../../config/database.js';
 import Teacher from './Teacher.js';
 
-const Course = sequelize.define('Course', {
+const Course = sequelize.define('course', {
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
+    autoIncrement: true,
     allowNull: false,
   },
   name: {
@@ -45,6 +46,7 @@ const Course = sequelize.define('Course', {
   },
 }, {
   timestamps: false,
+  tableName: 'course',
 });
 
 export default Course;
