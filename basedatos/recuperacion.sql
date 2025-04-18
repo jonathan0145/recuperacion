@@ -39,6 +39,9 @@ CREATE TABLE `course` (
   `teacher` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+ALTER TABLE course
+MODIFY COLUMN id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY;
+
 --
 -- Volcado de datos para la tabla `course`
 --
@@ -63,6 +66,8 @@ CREATE TABLE `person` (
   `age` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+ALTER TABLE person
+MODIFY COLUMN id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY;
 --
 -- Volcado de datos para la tabla `person`
 --
@@ -85,6 +90,8 @@ CREATE TABLE `student` (
   `grade_level` varchar(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+ALTER TABLE student
+MODIFY COLUMN id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY;
 --
 -- Volcado de datos para la tabla `student`
 --
@@ -125,6 +132,8 @@ CREATE TABLE `teacher` (
   `teach` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+ALTER TABLE teacher
+MODIFY COLUMN id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY;
 --
 -- Volcado de datos para la tabla `teacher`
 --
