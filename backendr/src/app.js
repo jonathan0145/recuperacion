@@ -5,7 +5,7 @@ import personRoutes from './routes/personRoutes.js';
 import studentRoutes from './routes/studentRoutes.js';
 import teacherRoutes from './routes/teacherRoutes.js';
 import courseRoutes from './routes/courseRoutes.js';
-// import studentCourseRoutes from './routes/studentCourseRoutes.js'
+import studentCourseRoutes from './routes/studentCourseRoutes.js'
 
 const app = express();
 
@@ -30,7 +30,7 @@ app.use('/api/persons', personRoutes);
 app.use('/api/students', studentRoutes);
 app.use('/api/teachers', teacherRoutes);
 app.use('/api/courses', courseRoutes);
-// app.use('/api/studentscourses', studentCourseRoutes);
+app.use('/api/studentscourses', studentCourseRoutes);
 
 // ... define other routes ...
 
