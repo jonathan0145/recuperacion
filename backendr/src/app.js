@@ -1,4 +1,5 @@
 import express from 'express';
+import cors from 'cors';
 import sequelize from '../config/database.js';
 import './models/associations.js';
 import personRoutes from './routes/personRoutes.js';
@@ -10,7 +11,11 @@ import userRoutes from './routes/userRoutes.js';
 
 const app = express();
 
+app.use(cors()); // Enable CORS for all routes
 app.use(express.json());
+
+// Define routes
+app.use('/api/users', userRoutes);
 
 // Test database connection
 sequelize.authenticate()

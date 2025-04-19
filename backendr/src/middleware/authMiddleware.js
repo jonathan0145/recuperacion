@@ -6,7 +6,7 @@ export const authenticateToken = (req, res, next) => {
 
   try {
     const verified = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = verified;
+    req.user = verified; // Ensure req.user is set correctly
     next();
   } catch (error) {
     res.status(400).json({ error: 'Invalid token' });

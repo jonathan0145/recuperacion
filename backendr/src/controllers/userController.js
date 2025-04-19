@@ -32,7 +32,7 @@ export const loginUser = async (req, res) => {
 // Obtener información del usuario
 export const getUserProfile = async (req, res) => {
   try {
-    const user = await User.findByPk(req.user.id);
+    const user = await User.findByPk(req.user.id); // Ensure req.user.id is correctly set
     res.json(user);
   } catch (error) {
     res.status(500).json({ error: 'Error al obtener el perfil del usuario', details: error.message });
