@@ -7,7 +7,6 @@ const StudentCourse = sequelize.define('studentcourse', {
     student_id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
-        autoIncrement: true,
         references: {
             model: Student,
             key: 'id',

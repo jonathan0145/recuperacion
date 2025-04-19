@@ -1,13 +1,14 @@
 import express from 'express';
 import { getAllCourses, getCourseById, createCourse, updateCourse, deleteCourse } from '../controllers/courseController.js';
+import { authenticateToken } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
 // Rutas para personas
-router.get('/', getAllCourses);
-router.get('/:id', getCourseById);
-router.post('/', createCourse);
-router.put('/:id', updateCourse);
-router.delete('/:id', deleteCourse);
+router.get('/', authenticateToken, getAllCourses);
+router.get('/:id', authenticateToken, getCourseById);
+router.post('/', authenticateToken, createCourse);
+router.put('/:id', authenticateToken, updateCourse);
+router.delete('/:id', authenticateToken, deleteCourse);
 
 export default router;

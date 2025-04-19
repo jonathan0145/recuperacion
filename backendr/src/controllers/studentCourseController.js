@@ -1,21 +1,22 @@
 import StudentCourse from '../models/StudentCourse.js';
 
-// Obtener todas las personas
+// Obtener todos los registros de StudentCourse
 export const getAllStudentCourses = async (req, res) => {
     try {
-        const studentcourses = await StudentCourse.findAll();
-        res.json(studentcourses);
-        console.log(StudentCourse);
-    
+        const studentCourses = await StudentCourse.findAll();
+        res.json(studentCourses);
     } catch (error) {
         res.status(500).json({ error: 'Error al obtener studentcourse' });
     }
 };
 
-// Obtener persona por ID
+// Obtener un registro de StudentCourse por IDs
 export const getStudentCourseById = async (req, res) => {
     try {
-        const studentCourse = await StudentCourse.findByPk(req.params.id);
+        const { student_id, course_id } = req.params;
+        const studentCourse = await StudentCourse.findOne({
+            where: { student_id, course_id }
+        });
         if (studentCourse) {
             res.json(studentCourse);
         } else {
@@ -26,15 +27,15 @@ export const getStudentCourseById = async (req, res) => {
     }
 };
 
-// Crear una nueva persona
+// Crear un nuevo registro de StudentCourse
 export const createStudentCourse = async (req, res) => {
     try {
-        const { name, first_name, last_name, document, date_of_birth, age } = req.body;
-        if (!name || !first_name || !last_name || !document || !date_of_birth || age === undefined) {
+        const { student_id, course_id } = req.body;
+        if (!student_id || !course_id) {
             return res.status(400).json({ error: 'Todos los campos son obligatorios' });
         }
 
-        const newStudentCourse = await StudentCourse.create(req.body);
+        const newStudentCourse = await StudentCourse.create({ student_id, course_id });
         res.status(201).json(newStudentCourse);
     } catch (error) {
         console.error('Error al crear studentcourse:', error);
@@ -42,29 +43,12 @@ export const createStudentCourse = async (req, res) => {
     }
 };
 
-// Actualizar una persona
-export const updateStudentCourse = async (req, res) => {
-    try {
-        const [updated] = await StudentCourse.update(req.body, {
-            where: { id: req.params.id }
-        });
-        if (updated) {
-            const updatedStudentCourse = await StudentCourse.findByPk(req.params.id);
-            res.json(updatedStudentCourse);
-        } else {
-            res.status(404).json({ error: 'studentcourse no encontrado' });
-        }
-    } catch (error) {
-        res.status(400).json({ error: 'Error al actualizar studentcourse' });
-    }
-};
-
-// Eliminar una persona
+// Eliminar un registro de StudentCourse
 export const deleteStudentCourse = async (req, res) => {
     try {
-        const { id } = req.params;
+        const { student_id, course_id } = req.params;
         const deleted = await StudentCourse.destroy({
-            where: { id }
+            where: { student_id, course_id }
         });
         if (deleted) {
             res.status(204).send();
