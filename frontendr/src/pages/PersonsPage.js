@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { getAllPersons, createPerson, updatePerson, deletePerson } from '../apiService';
-import '../styles.css'; // Import styles for dashboard
+import { getAllPersons, createPerson } from '../apiService';
+import TableComponent from '../components/TableComponent';
+import '../styles.css'; // Asegúrate de que este archivo CSS esté importado
 
 const PersonsPage = () => {
   const [persons, setPersons] = useState([]);
@@ -22,109 +23,71 @@ const PersonsPage = () => {
       const response = await getAllPersons();
       setPersons(response.data);
     } catch (error) {
-      console.error('Error fetching persons:', error);
+      console.error('Error al obtener las personas:', error);
     }
   };
 
   const handleCreate = async () => {
     try {
-      await createPerson(newPerson);
-      fetchPersons();
+      if (newPerson.name && newPerson.first_name && newPerson.last_name) { // Verifica campos requeridos
+        const response = await createPerson(newPerson);
+        if (response.status === 201) { // Verifica que la respuesta sea exitosa
+          fetchPersons(); // Actualiza la lista después de crear
+        } else {
+          console.error('Error al crear la persona:', response.statusText);
+        }
+      } else {
+        console.error('Por favor, completa todos los campos requeridos.');
+      }
     } catch (error) {
-      console.error('Error creating person:', error);
-    }
-  };
-
-  const handleUpdate = async (id) => {
-    try {
-      await updatePerson(id, newPerson);
-      fetchPersons();
-    } catch (error) {
-      console.error('Error updating person:', error);
-    }
-  };
-
-  const handleDelete = async (id) => {
-    try {
-      await deletePerson(id);
-      fetchPersons();
-    } catch (error) {
-      console.error('Error deleting person:', error);
+      console.error('Error al crear la persona:', error);
     }
   };
 
   return (
-    <div className="dashboard-container">
-      <h1>Persons Dashboard</h1>
+    <div className="page-container"> {/* Asegúrate de que esta clase esté aplicada */}
+      <h1 className="page-title">Panel de Personas</h1>
+      <p className="page-description">Administra los datos de las personas aquí.</p>
       <div className="form-container">
         <input
           type="text"
-          placeholder="Name"
+          placeholder="Nombre"
           value={newPerson.name}
           onChange={(e) => setNewPerson({ ...newPerson, name: e.target.value })}
         />
         <input
           type="text"
-          placeholder="First Name"
+          placeholder="Primer Nombre"
           value={newPerson.first_name}
           onChange={(e) => setNewPerson({ ...newPerson, first_name: e.target.value })}
         />
         <input
           type="text"
-          placeholder="Last Name"
+          placeholder="Apellido"
           value={newPerson.last_name}
           onChange={(e) => setNewPerson({ ...newPerson, last_name: e.target.value })}
         />
         <input
           type="text"
-          placeholder="Document"
+          placeholder="Documento"
           value={newPerson.document}
           onChange={(e) => setNewPerson({ ...newPerson, document: e.target.value })}
         />
         <input
           type="date"
-          placeholder="Date of Birth"
+          placeholder="Fecha de Nacimiento"
           value={newPerson.date_of_birth}
           onChange={(e) => setNewPerson({ ...newPerson, date_of_birth: e.target.value })}
         />
         <input
           type="number"
-          placeholder="Age"
+          placeholder="Edad"
           value={newPerson.age}
           onChange={(e) => setNewPerson({ ...newPerson, age: e.target.value })}
         />
-        <button onClick={handleCreate}>Add Person</button>
+        <button onClick={handleCreate}>Agregar Persona</button>
       </div>
-      <table className="persons-table">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Document</th>
-            <th>Date of Birth</th>
-            <th>Age</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {persons.map((person) => (
-            <tr key={person.id}>
-              <td>{person.name}</td>
-              <td>{person.first_name}</td>
-              <td>{person.last_name}</td>
-              <td>{person.document}</td>
-              <td>{person.date_of_birth}</td>
-              <td>{person.age}</td>
-              <td>
-                <button onClick={() => handleUpdate(person.id)}>Update</button>
-                <button onClick={() => handleDelete(person.id)}>Delete</button>
-                <button onClick={() => alert(`Displaying ${person.name}`)}>Display</button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <TableComponent data={persons} />
     </div>
   );
 };

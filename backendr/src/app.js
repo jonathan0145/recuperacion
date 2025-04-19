@@ -14,8 +14,6 @@ const app = express();
 app.use(cors()); // Enable CORS for all routes
 app.use(express.json());
 
-// Define routes
-app.use('/api/users', userRoutes);
 
 // Test database connection
 sequelize.authenticate()

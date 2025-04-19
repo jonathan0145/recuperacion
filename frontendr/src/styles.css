@@ -5,7 +5,7 @@ body {
 }
 
 .page-container {
-  background-image: url('./assets/background.jpg'); /* Ensure the path is correct */
+  background-image: url('./assets/background.jpg'); /* Asegúrate de que esta ruta sea correcta */
   background-size: cover;
   background-position: center;
   min-height: calc(100vh - 300px); /* Reduce height by 200px */
@@ -197,4 +197,23 @@ button:hover {
 
 .person-item button:hover {
   background-color: #0056b3;
+}
+
+/* Add these styles */
+.page-title {
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
+  padding: 10px; /* Optional: Add some padding */
+  border-radius: 5px; /* Optional: Add rounded corners */
+}
+
+.page-description {
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
+  padding: 5px; /* Optional: Add some padding */
+  border-radius: 5px; /* Optional: Add rounded corners */
+}
+
+
+.action-buttons {
+  display: flex;
+  gap: 5px; /* Espacio entre los botones */
 }
