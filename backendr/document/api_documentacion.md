@@ -173,3 +173,6 @@
 ## Autorización
 
 Para los endpoints que requieren autorización, incluye un Token Bearer en los encabezados de la solicitud.
+
+## link postman
+https://nadiam-6384570.postman.co/workspace/My-Workspace~003a7b66-33a8-403b-821a-612cc0dfb3b5/collection/28492294-f9b9fb7b-2262-44ed-a959-1162e6c5c226?action=share&creator=28492294
