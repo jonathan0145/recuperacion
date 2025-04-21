@@ -1,93 +1,96 @@
 import React, { useEffect, useState } from 'react';
-import { getAllPersons, createPerson } from '../apiService';
-import TableComponent from '../components/TableComponent';
-import '../styles.css'; // Asegúrate de que este archivo CSS esté importado
+import { getAllPersons, createPerson, deletePerson } from '../apiService'; // Add deletePerson to imports
+import FormPerson from '../components/FormPerson';
+import '../styles.css';
 
 const PersonsPage = () => {
   const [persons, setPersons] = useState([]);
-  const [newPerson, setNewPerson] = useState({
-    name: '',
-    first_name: '',
-    last_name: '',
-    document: '',
-    date_of_birth: '',
-    age: ''
-  });
+  const [showForm, setShowForm] = useState(false);
 
   useEffect(() => {
     fetchPersons();
   }, []);
 
+  useEffect(() => {
+    console.log("Updated persons state:", persons); // Log updated persons state
+  }, [persons]);
+
   const fetchPersons = async () => {
     try {
       const response = await getAllPersons();
-      setPersons(response.data);
+      console.log('Full response:', response); // Log the entire response
+      
+      const personsData = response.data || response; // Adjust this line based on actual structure
+      console.log('Fetched persons:', personsData); // Debugging: Log fetched data
+      setPersons(personsData || []); // Ensure it's an array
     } catch (error) {
-      console.error('Error al obtener las personas:', error);
+      console.error('Error fetching persons:', error);
     }
   };
 
-  const handleCreate = async () => {
+  const toggleForm = () => setShowForm(!showForm);
+
+  const handleCreatePerson = async (personData) => {
     try {
-      if (newPerson.name && newPerson.first_name && newPerson.last_name) { // Verifica campos requeridos
-        const response = await createPerson(newPerson);
-        if (response.status === 201) { // Verifica que la respuesta sea exitosa
-          fetchPersons(); // Actualiza la lista después de crear
-        } else {
-          console.error('Error al crear la persona:', response.statusText);
-        }
-      } else {
-        console.error('Por favor, completa todos los campos requeridos.');
-      }
+      await createPerson(personData);
+      fetchPersons(); // Refresh the list after creating a person
+      toggleForm(); // Close the form
     } catch (error) {
-      console.error('Error al crear la persona:', error);
+      console.error('Error creating person:', error);
+    }
+  };
+
+  const handleEdit = (person) => {
+    // Logic to edit the person
+    console.log('Edit person:', person);
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await deletePerson(id); // Call the API to delete the person
+      setPersons(persons.filter(person => person.id !== id)); // Update state to remove the person
+      console.log(`Deleted person with id: ${id}`);
+    } catch (error) {
+      console.error('Error deleting person:', error);
     }
   };
 
   return (
-    <div className="page-container"> {/* Asegúrate de que esta clase esté aplicada */}
-      <h1 className="page-title">Panel de Personas</h1>
-      <p className="page-description">Administra los datos de las personas aquí.</p>
-      <div className="form-container">
-        <input
-          type="text"
-          placeholder="Nombre"
-          value={newPerson.name}
-          onChange={(e) => setNewPerson({ ...newPerson, name: e.target.value })}
-        />
-        <input
-          type="text"
-          placeholder="Primer Nombre"
-          value={newPerson.first_name}
-          onChange={(e) => setNewPerson({ ...newPerson, first_name: e.target.value })}
-        />
-        <input
-          type="text"
-          placeholder="Apellido"
-          value={newPerson.last_name}
-          onChange={(e) => setNewPerson({ ...newPerson, last_name: e.target.value })}
-        />
-        <input
-          type="text"
-          placeholder="Documento"
-          value={newPerson.document}
-          onChange={(e) => setNewPerson({ ...newPerson, document: e.target.value })}
-        />
-        <input
-          type="date"
-          placeholder="Fecha de Nacimiento"
-          value={newPerson.date_of_birth}
-          onChange={(e) => setNewPerson({ ...newPerson, date_of_birth: e.target.value })}
-        />
-        <input
-          type="number"
-          placeholder="Edad"
-          value={newPerson.age}
-          onChange={(e) => setNewPerson({ ...newPerson, age: e.target.value })}
-        />
-        <button onClick={handleCreate}>Agregar Persona</button>
-      </div>
-      <TableComponent data={persons} />
+    <div className="page-container">
+      <h1 className="page-title">Person Management</h1>
+      <FormPerson show={showForm} handleClose={toggleForm} onPersonCreated={handleCreatePerson} />
+      <button onClick={toggleForm}>Create</button>
+      <table className="table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {persons.length > 0 ? (
+            persons.map((person, index) => {
+              console.log('Person object:', person); // Log each person object
+              console.log(`Row created for person with ID: ${person.id}`); // Log row creation
+              return (
+                <tr key={person.id || index}>
+                  <td>{person.id}</td>
+                  <td>{person.name}</td> {/* Ensure 'name' is the correct property */}
+                  <td>
+                    <button onClick={() => handleEdit(person)}>Edit</button>
+                    <button onClick={() => handleDelete(person.id)}>Delete</button>
+                  </td>
+                </tr>
+              );
+            })
+          ) : (
+            <tr>
+              <td colSpan="3">No persons available</td>
+            </tr>
+          )}
+        </tbody>
+      </table>
     </div>
   );
 };

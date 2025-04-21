@@ -1,30 +1,32 @@
 import React from 'react';
 import { Button, Table } from 'react-bootstrap';
-import '../styles.css'; // Importa el archivo de estilos
+import '../styles.css';
 
-const TableComponent = () => {
+const TableComponent = ({ onCreateClick, data = [], columns }) => {
+  console.log('Data:', data); // Debugging: Log data
+  console.log('Columns:', columns); // Debugging: Log columns
+
   return (
     <div className="container mt-4">
-      <Button variant="primary" className="mb-3">Create</Button>
+      <Button variant="primary" className="mb-3" onClick={onCreateClick}>Create</Button>
       <Table striped bordered hover>
         <thead>
           <tr>
-            <th>#</th>
-            <th>Information</th>
-            <th>Action</th>
+            {columns.map((column, index) => (
+              <th key={index}>{column.header}</th>
+            ))}
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>1</td>
-            <td>Sample Data</td>
-            <td className="action-buttons"> {/* Aplica la clase CSS */}
-              <Button variant="info">Show</Button>
-              <Button variant="warning">Edit</Button>
-              <Button variant="danger">Delete</Button>
-            </td>
-          </tr>
-          {/* Add more rows as needed */}
+          {data.map((item, index) => (
+            <tr key={item.id || index}>
+              {columns.map((column, colIndex) => (
+                <td key={colIndex}>
+                  {column.Cell ? column.Cell({ row: item }) : item[column.accessor]}
+                </td>
+              ))}
+            </tr>
+          ))}
         </tbody>
       </Table>
     </div>

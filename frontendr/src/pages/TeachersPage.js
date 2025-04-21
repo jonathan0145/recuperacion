@@ -1,57 +1,91 @@
 import React, { useEffect, useState } from 'react';
-import { getAllTeachers, createTeacher } from '../apiService';
-import TableComponent from '../components/TableComponent';
+import { getAllTeachers, createTeacher, deleteTeacher } from '../apiService';
+import FormTeacher from '../components/FormTeacher';
 import '../styles.css';
 
 const TeachersPage = () => {
   const [teachers, setTeachers] = useState([]);
-  const [newTeacher, setNewTeacher] = useState({
-    specialty: '',
-    teach: ''
-  });
+  const [showForm, setShowForm] = useState(false);
 
   useEffect(() => {
     fetchTeachers();
   }, []);
 
+  useEffect(() => {
+    console.log("Updated teachers state:", teachers); // Log updated teachers state
+  }, [teachers]);
+
   const fetchTeachers = async () => {
     try {
       const response = await getAllTeachers();
-      setTeachers(response.data);
+      console.log('Full response:', response); // Log the entire response
+      const teachersData = response.data || response; // Adjust this line based on actual structure
+      console.log('Fetched teachers:', teachersData); // Debugging: Log fetched data
+      setTeachers(teachersData || []); // Ensure it's an array
     } catch (error) {
-      console.error('Error al obtener los profesores:', error);
+      console.error('Error fetching teachers:', error);
     }
   };
 
-  const handleCreate = async () => {
+  const toggleForm = () => setShowForm(!showForm);
+
+  const handleCreateTeacher = async (teacherData) => {
     try {
-      await createTeacher(newTeacher);
-      fetchTeachers();
+      await createTeacher(teacherData);
+      fetchTeachers(); // Refresh the list after creating a teacher
+      toggleForm(); // Close the form
     } catch (error) {
-      console.error('Error al crear el profesor:', error);
+      console.error('Error creating teacher:', error);
+    }
+  };
+
+  const handleEditTeacher = (teacher) => {
+    // Logic to edit the teacher
+    console.log('Edit teacher:', teacher);
+  };
+
+  const handleDeleteTeacher = async (id) => {
+    try {
+      await deleteTeacher(id); // Call the API to delete the teacher
+      setTeachers((prevTeachers) => prevTeachers.filter(teacher => teacher.id !== id)); // Update state to remove the teacher
+      console.log(`Deleted teacher with id: ${id}`);
+    } catch (error) {
+      console.error('Error deleting teacher:', error);
     }
   };
 
   return (
     <div className="page-container">
-      <h1 className="page-title">Página de Profesores</h1>
-      <p className="page-description">La lista de profesores se mostrará aquí.</p>
-      <div className="form-container">
-        <input
-          type="text"
-          placeholder="Especialidad"
-          value={newTeacher.specialty}
-          onChange={(e) => setNewTeacher({ ...newTeacher, specialty: e.target.value })}
-        />
-        <input
-          type="text"
-          placeholder="Enseñanza"
-          value={newTeacher.teach}
-          onChange={(e) => setNewTeacher({ ...newTeacher, teach: e.target.value })}
-        />
-        <button onClick={handleCreate}>Agregar Profesor</button>
-      </div>
-      <TableComponent data={teachers} />
+      <h1 className="page-title">Teacher Management</h1>
+      <FormTeacher show={showForm} handleClose={toggleForm} onTeacherCreated={handleCreateTeacher} />
+      <button onClick={toggleForm}>Create</button>
+      <table className="table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Specialty</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {teachers.length > 0 ? (
+            teachers.map((teacher, index) => (
+              <tr key={teacher.id || index}>
+                <td>{teacher.id}</td>
+                <td>{teacher.specialty}</td>
+                <td>
+                  <button onClick={() => handleEditTeacher(teacher)}>Edit</button>
+                  <button onClick={() => handleDeleteTeacher(teacher.id)}>Delete</button>
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="3">No teachers available</td>
+            </tr>
+          )}
+        </tbody>
+      </table>
     </div>
   );
 };

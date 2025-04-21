@@ -1,71 +1,91 @@
 import React, { useEffect, useState } from 'react';
-import { getAllStudents, createStudent } from '../apiService';
-import TableComponent from '../components/TableComponent';
+import { getAllStudents, createStudent, deleteStudent } from '../apiService';
+import FormStudent from '../components/FormStudent';
 import '../styles.css';
 
 const StudentsPage = () => {
   const [students, setStudents] = useState([]);
-  const [newStudent, setNewStudent] = useState({
-    email: '',
-    enrollment_date: '',
-    student_status: '',
-    grade_level: ''
-  });
+  const [showForm, setShowForm] = useState(false);
 
   useEffect(() => {
     fetchStudents();
   }, []);
 
+  useEffect(() => {
+    console.log("Updated students state:", students); // Log updated students state
+  }, [students]);
+
   const fetchStudents = async () => {
     try {
       const response = await getAllStudents();
-      setStudents(response.data);
+      console.log('Full response:', response); // Log the entire response
+      const studentsData = response.data || response; // Adjust this line based on actual structure
+      console.log('Fetched students:', studentsData); // Debugging: Log fetched data
+      setStudents(studentsData || []); // Ensure it's an array
     } catch (error) {
-      console.error('Error al obtener los estudiantes:', error);
+      console.error('Error fetching students:', error);
     }
   };
 
-  const handleCreate = async () => {
+  const toggleForm = () => setShowForm(!showForm);
+
+  const handleCreateStudent = async (studentData) => {
     try {
-      await createStudent(newStudent);
-      fetchStudents();
+      await createStudent(studentData);
+      fetchStudents(); // Refresh the list after creating a student
+      toggleForm(); // Close the form
     } catch (error) {
-      console.error('Error al crear el estudiante:', error);
+      console.error('Error creating student:', error);
+    }
+  };
+
+  const handleEditStudent = (student) => {
+    // Logic to edit the student
+    console.log('Edit student:', student);
+  };
+
+  const handleDeleteStudent = async (id) => {
+    try {
+      await deleteStudent(id); // Call the API to delete the student
+      setStudents(students.filter(student => student.id !== id)); // Update state to remove the student
+      console.log(`Deleted student with id: ${id}`);
+    } catch (error) {
+      console.error('Error deleting student:', error);
     }
   };
 
   return (
     <div className="page-container">
-      <h1 className="page-title">Página de Estudiantes</h1>
-      <p className="page-description">La lista de estudiantes se mostrará aquí.</p>
-      <div className="form-container">
-        <input
-          type="email"
-          placeholder="Email"
-          value={newStudent.email}
-          onChange={(e) => setNewStudent({ ...newStudent, email: e.target.value })}
-        />
-        <input
-          type="date"
-          placeholder="Fecha de Inscripción"
-          value={newStudent.enrollment_date}
-          onChange={(e) => setNewStudent({ ...newStudent, enrollment_date: e.target.value })}
-        />
-        <input
-          type="text"
-          placeholder="Estado del Estudiante"
-          value={newStudent.student_status}
-          onChange={(e) => setNewStudent({ ...newStudent, student_status: e.target.value })}
-        />
-        <input
-          type="text"
-          placeholder="Nivel de Grado"
-          value={newStudent.grade_level}
-          onChange={(e) => setNewStudent({ ...newStudent, grade_level: e.target.value })}
-        />
-        <button onClick={handleCreate}>Agregar Estudiante</button>
-      </div>
-      <TableComponent data={students} />
+      <h1 className="page-title">Student Management</h1>
+      <FormStudent show={showForm} handleClose={toggleForm} onStudentCreated={handleCreateStudent} />
+      <button onClick={toggleForm}>Create</button>
+      <table className="table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Email</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {students.length > 0 ? (
+            students.map((student, index) => (
+              <tr key={student.id || index}>
+                <td>{student.id}</td>
+                <td>{student.email}</td>
+                <td>
+                  <button onClick={() => handleEditStudent(student)}>Edit</button>
+                  <button onClick={() => handleDeleteStudent(student.id)}>Delete</button>
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="3">No students available</td>
+            </tr>
+          )}
+        </tbody>
+      </table>
     </div>
   );
 };

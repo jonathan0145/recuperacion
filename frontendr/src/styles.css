@@ -217,3 +217,9 @@ button:hover {
   display: flex;
   gap: 5px; /* Espacio entre los botones */
 }
+
+.form-container-column {
+  display: flex;
+  flex-direction: column;
+  gap: 10px; /* Espacio entre los inputs */
+}

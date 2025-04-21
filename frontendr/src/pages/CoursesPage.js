@@ -1,20 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { getAllCourses, createCourse } from '../apiService';
-import TableComponent from '../components/TableComponent';
+import { getAllCourses, createCourse, deleteCourse } from '../apiService';
+import FormCourse from '../components/FormCourse';
 import '../styles.css';
 
 const CoursesPage = () => {
   const [courses, setCourses] = useState([]);
-  const [newCourse, setNewCourse] = useState({
-    name: '',
-    credits: '',
-    schedule: '',
-    level: '',
-    start_date: '',
-    end_date: '',
-    capacity: '',
-    teachers: ''
-  });
+  const [showForm, setShowForm] = useState(false);
 
   useEffect(() => {
     fetchCourses();
@@ -23,77 +14,74 @@ const CoursesPage = () => {
   const fetchCourses = async () => {
     try {
       const response = await getAllCourses();
-      setCourses(response.data);
+      console.log('Fetched courses:', response); // Log the entire response
+      const coursesData = response.data || response; // Adjust this line based on actual structure
+      console.log('Fetched courses:', coursesData); // Debugging: Log fetched data
+      setCourses(coursesData || []); // Ensure it's an array
     } catch (error) {
-      console.error('Error al obtener los cursos:', error);
+      console.error('Error fetching courses:', error);
     }
   };
 
-  const handleCreate = async () => {
+  const toggleForm = () => setShowForm(!showForm);
+
+  const handleCreateCourse = async (courseData) => {
     try {
-      await createCourse(newCourse);
-      fetchCourses();
+      await createCourse(courseData);
+      fetchCourses(); // Refresh the list after creating a course
+      toggleForm(); // Close the form
     } catch (error) {
-      console.error('Error al crear el curso:', error);
+      console.error('Error creating course:', error);
     }
+  };
+
+  const handleDeleteCourse = async (id) => {
+    try {
+      await deleteCourse(id); // Call the API to delete the course
+      setCourses((prevCourses) => prevCourses.filter(course => course.id !== id)); // Update state to remove the course
+      console.log(`Deleted course with id: ${id}`);
+    } catch (error) {
+      console.error('Error deleting course:', error);
+    }
+  };
+
+  const handleEditCourse = (course) => {
+    // Logic to edit the course
+    console.log('Edit course:', course);
   };
 
   return (
     <div className="page-container">
-      <h1 className="page-title">Página de Cursos</h1>
-      <p className="page-description">La lista de cursos se mostrará aquí.</p>
-      <div className="form-container">
-        <input
-          type="text"
-          placeholder="Nombre"
-          value={newCourse.name}
-          onChange={(e) => setNewCourse({ ...newCourse, name: e.target.value })}
-        />
-        <input
-          type="number"
-          placeholder="Créditos"
-          value={newCourse.credits}
-          onChange={(e) => setNewCourse({ ...newCourse, credits: e.target.value })}
-        />
-        <input
-          type="text"
-          placeholder="Horario"
-          value={newCourse.schedule}
-          onChange={(e) => setNewCourse({ ...newCourse, schedule: e.target.value })}
-        />
-        <input
-          type="text"
-          placeholder="Nivel"
-          value={newCourse.level}
-          onChange={(e) => setNewCourse({ ...newCourse, level: e.target.value })}
-        />
-        <input
-          type="date"
-          placeholder="Fecha de Inicio"
-          value={newCourse.start_date}
-          onChange={(e) => setNewCourse({ ...newCourse, start_date: e.target.value })}
-        />
-        <input
-          type="date"
-          placeholder="Fecha de Fin"
-          value={newCourse.end_date}
-          onChange={(e) => setNewCourse({ ...newCourse, end_date: e.target.value })}
-        />
-        <input
-          type="number"
-          placeholder="Capacidad"
-          value={newCourse.capacity}
-          onChange={(e) => setNewCourse({ ...newCourse, capacity: e.target.value })}
-        />
-        <input
-          type="number"
-          placeholder="Profesores"
-          value={newCourse.teachers}
-          onChange={(e) => setNewCourse({ ...newCourse, teachers: e.target.value })}
-        />
-        <button onClick={handleCreate}>Agregar Curso</button>
-      </div>
-      <TableComponent data={courses} />
+      <h1 className="page-title">Course Management</h1>
+      <FormCourse show={showForm} handleClose={toggleForm} onCourseCreated={handleCreateCourse} />
+      <button onClick={toggleForm}>Create</button>
+      <table className="table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {courses.length > 0 ? (
+            courses.map((course, index) => (
+              <tr key={course.id || index}>
+                <td>{course.id}</td>
+                <td>{course.name}</td>
+                <td>
+                  <button onClick={() => handleEditCourse(course)}>Edit</button> {/* Add Edit button */}
+                  <button onClick={() => handleDeleteCourse(course.id)}>Delete</button>
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="3">No courses available</td>
+            </tr>
+          )}
+        </tbody>
+      </table>
     </div>
   );
 };
